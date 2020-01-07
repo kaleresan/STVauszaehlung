@@ -1,16 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace STVaustaehlung
 {
-    class Program
+    internal class Program
     {
-        static List<Option> Options = new List<Option>();
-        static List<Vote> Votes = new List<Vote>();
-        static void Main(string[] args)
+        private static List<Option> Options = new List<Option>();
+        private static List<Vote> Votes = new List<Vote>();
+
+        private static void Main(string[] args)
+        {
+            GetOptions();
+            GetVotes();
+
+            Console.WriteLine();
+
+            CountVotes();
+            Console.WriteLine(Options.First().Name + " gewinnt");
+
+            Console.ReadKey();
+        }
+
+        private static void GetOptions()
         {
             Console.WriteLine("Bitte Trage alle wählbaren Optionen getrennt durch ein \",\" ein");
             string input = Console.ReadLine();
@@ -20,6 +32,10 @@ namespace STVaustaehlung
                 Options.Add(new Option(inputs[i], i));
             }
             Console.Clear();
+        }
+
+        private static void GetVotes()
+        {
             string optionsstring = "";
             foreach (var option in Options)
             {
@@ -31,9 +47,9 @@ namespace STVaustaehlung
             Console.WriteLine();
             while (true)
             {
-                input = Console.ReadLine();
+                string input = Console.ReadLine();
                 if (input.Equals("ENDE")) break;
-                inputs = input.Split(',');
+                string[] inputs = input.Split(',');
                 int n = -1;
                 bool isNumeric = true;
                 List<Option> vote = new List<Option>();
@@ -69,50 +85,45 @@ namespace STVaustaehlung
                         Console.WriteLine(output);
                     }
                 }
-
             }
+        }
 
-
-            Console.WriteLine();
-            for (int i = 0; i <= Options.Count; i++)
+        private static void CountVotes()
+        {
+            foreach (var item in Options)
             {
-                foreach (var item in Options)
-                {
-                    item.Votes = 0;
-                }
-
-
-                foreach (Vote vote in Votes)
-                {
-                    Options.Where(c => c.ID == vote.Votes.First().ID).First().Votes++;
-                }
-
-
-                Option looser = Options.First(); ;
-                int looseramount = Int32.MaxValue;
-                foreach (Option option1 in Options)
-                {
-                    Console.WriteLine(option1.Name + ": " + option1.Votes);
-                    if (looseramount > option1.Votes)
-                    {
-                        looseramount = option1.Votes;
-                        looser = option1;
-                    }
-                }
-                foreach (var item in Votes)
-                {
-                    item.Votes.Remove(looser);
-                }
-                Options.Remove(looser);
-                Console.WriteLine(looser.Name + " hat die wenigsten Stimmen");
-                Console.WriteLine();
+                item.Votes = 0;
             }
 
+            foreach (Vote vote in Votes)
+            {
+                Options.Where(c => c.ID == vote.Votes.First().ID).First().Votes++;
+            }
+
+            Option looser = Options.First(); ;
+            int looseramount = Int32.MaxValue;
+            foreach (Option option1 in Options)
+            {
+                Console.WriteLine(option1.Name + ": " + option1.Votes);
+                if (looseramount > option1.Votes)
+                {
+                    looseramount = option1.Votes;
+                    looser = option1;
+                }
+            }
+            foreach (var item in Votes)
+            {
+                item.Votes.Remove(looser);
+            }
+            Options.Remove(looser);
+            Console.WriteLine(looser.Name + " hat die wenigsten Stimmen");
             Console.WriteLine();
-            Console.WriteLine(Options.First().Name + ": " + Votes.Count());
 
+            if(Options.Count > 1)
+            {
+                CountVotes();
+            }
 
-            Console.ReadKey();
         }
     }
 }
